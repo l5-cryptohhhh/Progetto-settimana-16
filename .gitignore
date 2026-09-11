@@ -1,0 +1,19 @@
+### IDE ###
+.idea/
+*.iml
+.vscode/
+
+### Build ###
+target/
+node_modules/
+dist/
+
+### Segreti e dati locali ###
+env.properties
+.env
+.env.local
+uploads/
+
+### OS ###
+.DS_Store
+Thumbs.db

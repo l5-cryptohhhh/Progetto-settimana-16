@@ -1,0 +1,1377 @@
+/* ---------- Token: brand Scatto ---------- */
+:root {
+  color-scheme: dark;
+  --font-display: 'Poppins', 'Inter Variable', system-ui, sans-serif;
+  --font: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Palette del brand */
+  --violet: #7c3aed;
+  --violet-hover: #6d28d9;
+  --violet-press: #5b21b6;
+  --violet-text: #a78bfa;
+  --violet-soft: rgb(124 58 237 / 0.16);
+  --violet-line: rgb(167 139 250 / 0.42);
+  --ink: #0f0f0f;
+  --mist: #f5f5f7;
+
+  /* La parete (sfondo) e i piani appoggiati sopra: la gerarchia la danno i piani, non i riquadri */
+  --wall: var(--ink);
+  --plane: #17171a;
+  --plane-2: #1f1f23;
+  --plane-3: #2a2a2f;
+  --line: rgb(255 255 255 / 0.08);
+  --line-strong: rgb(255 255 255 / 0.14);
+  --text: var(--mist);
+  --text-2: #a1a1aa;
+  --text-3: #8a8a93;
+  --on-violet: #fff;
+  --focus: var(--violet-text);
+
+  --danger: #f87171;
+  --danger-fill: #dc2626;
+  --danger-soft: rgb(248 113 113 / 0.12);
+  --success: #4ade80;
+  --success-soft: rgb(74 222 128 / 0.12);
+
+  --shadow-md: 0 2px 6px rgb(0 0 0 / 0.35), 0 16px 40px -12px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 4px 12px rgb(0 0 0 / 0.45), 0 32px 72px -16px rgb(0 0 0 / 0.8);
+  --shadow-violet: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 8px 22px -8px rgb(124 58 237 / 0.75);
+
+  /* Forme: campi e pulsanti 12px, pannelli 16px, opere e dialog 22px */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-pill: 999px;
+
+  /* Uscita esponenziale per gli stati, piccola molla solo per i cambi fisici */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: linear(0, 0.18 4%, 0.52 10%, 0.8 17%, 0.94 24%, 1.01 31%, 1.03 38%, 1.02 48%, 1.005 64%, 1);
+  --dur-fast: 160ms;
+  --dur: 240ms;
+  --dur-slow: 320ms;
+  --dur-focus: 260ms;
+
+  /* Una sola colonna per tutte le pagine: il feed ne occupa la fascia centrale da 600px */
+  --content-w: 1120px;
+  /* Griglia a 4 colonne condivisa: griglia del profilo, due metà del nuovo post, feed sulle due centrali */
+  --grid-gap: 24px;
+  --rail-w: 248px;
+  --topbar-h: 60px;
+  --tabbar-h: 68px;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--wall);
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--plane-3) var(--wall);
+}
+
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--wall);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--violet-text);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+time {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgb(124 58 237 / 0.55);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Logo ---------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36em;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.logo-mark {
+  flex: none;
+  width: 1.18em;
+  height: 1.18em;
+}
+
+/* ---------- Mirino: gli angoli del logo inquadrano ciò che è a fuoco ---------- */
+.vf {
+  --vf-inset: 14px;
+  --vf-size: 28px;
+  --vf-weight: 3px;
+  --vf-radius: 11px;
+  --vf-dot: 12px;
+  --vf-color: rgb(255 255 255 / 0.94);
+  position: absolute;
+  z-index: 2;
+  inset: var(--vf-inset);
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.45));
+}
+
+.vf > i {
+  position: absolute;
+  width: var(--vf-size);
+  height: var(--vf-size);
+  border: 0 solid var(--vf-color);
+  transition:
+    transform var(--dur-focus) var(--ease-out),
+    opacity var(--dur-focus) var(--ease-out),
+    border-color var(--dur) ease;
+}
+
+.vf > i:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-width: var(--vf-weight) 0 0 var(--vf-weight);
+  border-top-left-radius: var(--vf-radius);
+}
+
+.vf > i:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-width: var(--vf-weight) var(--vf-weight) 0 0;
+  border-top-right-radius: var(--vf-radius);
+}
+
+.vf > i:nth-child(3) {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 var(--vf-weight) var(--vf-weight);
+  border-bottom-left-radius: var(--vf-radius);
+}
+
+.vf > i:nth-child(4) {
+  right: 0;
+  bottom: 0;
+  border-width: 0 var(--vf-weight) var(--vf-weight) 0;
+  border-bottom-right-radius: var(--vf-radius);
+}
+
+/* Come nel logo: al posto dell'angolo in alto a destra c'è il punto viola */
+.vf-dot > i:nth-child(2) {
+  display: none;
+}
+
+.vf-dot::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--vf-dot) / -4);
+  right: calc(var(--vf-dot) / -4);
+  width: var(--vf-dot);
+  height: var(--vf-dot);
+  border-radius: 50%;
+  background: var(--violet);
+  transition:
+    transform var(--dur-focus) var(--ease-out),
+    opacity var(--dur-focus) var(--ease-out);
+}
+
+/* Messa a fuoco: gli angoli si stringono sull'opera al centro dello schermo, sotto il puntatore o col focus */
+.vf-reveal > i,
+.vf-reveal::after {
+  opacity: 0;
+}
+
+.vf-reveal > i:nth-child(1) {
+  transform: translate(-10px, -10px);
+}
+
+.vf-reveal > i:nth-child(2) {
+  transform: translate(10px, -10px);
+}
+
+.vf-reveal > i:nth-child(3) {
+  transform: translate(-10px, 10px);
+}
+
+.vf-reveal > i:nth-child(4) {
+  transform: translate(10px, 10px);
+}
+
+.vf-reveal::after {
+  transform: scale(0.3);
+}
+
+.reveal-host:is(:focus-within, .is-focused) .vf-reveal > i,
+.reveal-host:is(:focus-within, .is-focused) .vf-reveal::after {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: hover) {
+  .reveal-host:hover .vf-reveal > i,
+  .reveal-host:hover .vf-reveal::after {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Il punto si accende appena dopo che gli angoli hanno inquadrato */
+.reveal-host .vf-reveal::after {
+  transition-delay: 90ms;
+}
+
+/* ---------- Pulsanti ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--r-sm);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur) var(--ease-out),
+    color var(--dur-fast) ease,
+    opacity var(--dur-fast) ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-primary {
+  background: var(--violet);
+  color: var(--on-violet);
+  box-shadow: var(--shadow-violet);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--violet-press);
+}
+
+.btn-secondary {
+  background: var(--plane-2);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+}
+
+.btn-danger {
+  background: var(--danger-fill);
+  color: #fff;
+}
+
+/* Sopra un'immagine o un video */
+.btn-glass {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  backdrop-filter: blur(12px);
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    background: var(--violet-hover);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--plane-3);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--plane-2);
+    color: var(--text);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+  .btn-glass:hover {
+    background: rgb(255 255 255 / 0.24);
+  }
+}
+
+.btn-small {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+}
+
+.btn-large {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: 1rem;
+}
+
+.btn-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: var(--plane-2);
+    color: var(--text);
+  }
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+}
+
+/* ---------- Campi ---------- */
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field > label,
+.field > legend {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.field > legend {
+  margin-bottom: 8px;
+}
+
+.optional {
+  margin-left: 4px;
+  font-weight: 450;
+  color: var(--text-3);
+}
+
+input:is([type='text'], [type='email'], [type='password'], [type='search']),
+input:not([type]),
+textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--plane);
+  caret-color: var(--violet-text);
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) {
+  input:is([type='text'], [type='email'], [type='password'], [type='search']):hover:not(:focus),
+  input:not([type]):hover:not(:focus),
+  textarea:hover:not(:focus) {
+    border-color: var(--line-strong);
+  }
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-3);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--violet);
+  box-shadow: 0 0 0 4px var(--violet-soft);
+}
+
+/* Autocompletamento del browser: resta sul piano scuro invece del giallo di sistema */
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--violet-text);
+  box-shadow: 0 0 0 100px var(--plane) inset;
+}
+
+input[type='search']::-webkit-search-cancel-button {
+  filter: invert(1) brightness(0.7);
+  cursor: pointer;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+input[aria-invalid='true']:focus {
+  box-shadow: 0 0 0 4px var(--danger-soft);
+}
+
+textarea {
+  min-height: 112px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.field-hint,
+.field-error {
+  font-size: 0.8125rem;
+}
+
+.field-hint {
+  color: var(--text-3);
+}
+
+.field-error {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.counter {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Messaggi, stati ---------- */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  animation: rise var(--dur) var(--ease-out);
+}
+
+.note > svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.note ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.note p + ul {
+  margin-top: 4px;
+}
+
+.note .btn-link {
+  margin-top: 4px;
+}
+
+.note-error {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.note-success {
+  align-items: center;
+  background: var(--success-soft);
+  color: var(--success);
+  font-weight: 550;
+}
+
+.note-info {
+  background: var(--plane-2);
+  color: var(--text-2);
+}
+
+.spinner {
+  display: inline-block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: spin 0.7s linear infinite;
+}
+
+.skeleton {
+  display: block;
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--plane) 40%, var(--plane-2) 50%, var(--plane) 60%) 0 0 / 300% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+.skeleton-avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.skeleton-line {
+  width: 40%;
+  height: 12px;
+}
+
+.skeleton-line.wide {
+  width: 72%;
+}
+
+/* Stato vuoto: il mirino inquadra lo spazio che il contenuto occuperà */
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--text-2);
+}
+
+.empty-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  margin-bottom: 14px;
+  color: var(--text-2);
+}
+
+.empty-frame .vf {
+  --vf-inset: 0;
+  --vf-size: 26px;
+  --vf-radius: 10px;
+  --vf-dot: 11px;
+  --vf-color: var(--line-strong);
+  filter: none;
+}
+
+.empty h2 {
+  color: var(--text);
+}
+
+.empty p {
+  max-width: 40ch;
+}
+
+.empty .btn {
+  margin-top: 14px;
+}
+
+.load-more {
+  justify-self: center;
+  margin-top: 8px;
+}
+
+/* Foto che non si carica (file mancante sul server): piano scuro con il mirino vuoto */
+.photo-missing {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  background: var(--plane);
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.carousel-track .photo-missing {
+  aspect-ratio: 4 / 5;
+}
+
+.photo-missing .empty-frame {
+  width: 72px;
+  height: 72px;
+  margin: 0;
+  color: var(--text-3);
+}
+
+.photo-missing .empty-frame .vf {
+  --vf-size: 18px;
+  --vf-weight: 2.5px;
+  --vf-radius: 8px;
+}
+
+/* ---------- Area di caricamento file (foto e documenti) ---------- */
+.dropzone {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  min-height: 360px;
+  padding: 48px 32px;
+  border-radius: var(--r-lg);
+  background: var(--plane);
+  color: var(--text-2);
+  text-align: center;
+  cursor: pointer;
+  isolation: isolate;
+  transition: background-color var(--dur) ease;
+}
+
+/* Gli angoli del mirino al posto del bordo tratteggiato */
+.dropzone > .vf {
+  --vf-inset: 16px;
+  --vf-color: var(--line-strong);
+  filter: none;
+}
+
+.dropzone:hover > .vf,
+.dropzone.is-dragging > .vf {
+  --vf-color: var(--violet-text);
+}
+
+/* Righe diagonali del brand mentre si trascina un file sopra l'area */
+.dropzone.is-dragging {
+  background:
+    repeating-linear-gradient(-45deg, rgb(124 58 237 / 0.14) 0 10px, transparent 10px 22px),
+    var(--plane);
+}
+
+.dropzone-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--violet-soft);
+  color: var(--violet-text);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .dropzone:hover .dropzone-icon {
+    transform: translateY(-3px);
+  }
+}
+
+.dropzone strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dropzone-hint {
+  max-width: 38ch;
+  font-size: 0.875rem;
+}
+
+.dropzone:has(input:focus-visible),
+.thumb-add:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ---------- Avatar ---------- */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: var(--plane-3);
+  color: var(--mist);
+  font-family: var(--font-display);
+  font-size: calc(var(--size) * 0.4);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Anello viola attorno all'avatar, come le storie del mockup */
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 3px;
+  border: 2px solid var(--violet);
+  border-radius: 50%;
+  transition:
+    transform var(--dur) var(--ease-out),
+    border-color var(--dur) ease;
+}
+
+.ring-muted {
+  border-color: var(--line-strong);
+}
+
+/* ---------- Controllo segmentato ---------- */
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--plane);
+  box-shadow: inset 0 0 0 1px var(--line);
+  isolation: isolate;
+}
+
+.segmented-thumb {
+  position: absolute;
+  z-index: -1;
+  inset: 4px auto 4px 4px;
+  width: calc((100% - 8px) / var(--count));
+  border-radius: 10px;
+  background: var(--plane-3);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 2px 8px rgb(0 0 0 / 0.35);
+  transform: translateX(calc(var(--index) * 100%));
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.segmented button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.segmented button:hover {
+  color: var(--text);
+}
+
+.segmented button[aria-checked='true'] {
+  color: var(--text);
+}
+
+.segmented button[aria-checked='true'] svg {
+  color: var(--violet-text);
+}
+
+.segmented button:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Dialog ---------- */
+.modal {
+  width: min(100% - 32px, 440px);
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-lg);
+  background: var(--plane);
+  color: var(--text);
+  box-shadow:
+    var(--shadow-lg),
+    inset 0 0 0 1px var(--line);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.modal[open] {
+  animation: materialize var(--dur-slow) var(--ease-out);
+}
+
+.modal::backdrop {
+  background: rgb(0 0 0 / 0.64);
+  backdrop-filter: blur(6px);
+  animation: fade var(--dur) ease-out;
+}
+
+.modal-body {
+  display: grid;
+  gap: 10px;
+  padding: 28px;
+}
+
+.modal-body p {
+  color: var(--text-2);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* ---------- Guscio dell'app ---------- */
+.shell {
+  min-height: 100dvh;
+}
+
+.rail {
+  display: none;
+}
+
+/* Barra superiore e barra delle schede: solo su schermi stretti */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--topbar-h);
+  padding: 0 6px 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgb(15 15 15 / 0.86);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.topbar-logo {
+  display: inline-flex;
+  border-radius: var(--r-xs);
+}
+
+.tabbar {
+  position: fixed;
+  z-index: 30;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  padding: 0 max(24px, env(safe-area-inset-left)) env(safe-area-inset-bottom);
+  border-top: 1px solid var(--line);
+  background: rgb(15 15 15 / 0.9);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.tab {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  min-height: 56px;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  font-weight: 550;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--dur-fast) ease;
+}
+
+.tab.active {
+  color: var(--text);
+}
+
+/* Il punto viola del logo segna la scheda attiva, in alto a destra dell'icona */
+.tab::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: calc(50% + 10px);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--violet);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity var(--dur) ease,
+    transform var(--dur-slow) var(--ease-spring);
+}
+
+.tab.active::before {
+  opacity: 1;
+  transform: none;
+}
+
+.tab:active {
+  transform: scale(0.94);
+}
+
+/* Il + viola al centro, sollevato sopra la barra come nel mockup */
+.tab-new {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--violet);
+  color: #fff;
+  box-shadow: var(--shadow-violet);
+  translate: 0 -12px;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.tab-new:active {
+  transform: scale(0.92);
+  background: var(--violet-press);
+}
+
+/* Pagina attiva: il punto del logo appoggiato all'angolo in alto a destra del + */
+.tab-new::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--wall);
+  border-radius: 50%;
+  background: var(--violet);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity var(--dur-focus) var(--ease-out),
+    transform var(--dur-focus) var(--ease-out);
+}
+
+.tab-new.active::after {
+  opacity: 1;
+  transform: none;
+}
+
+.page {
+  width: 100%;
+  min-width: 0;
+  padding: 20px 16px calc(var(--tabbar-h) + 40px + env(safe-area-inset-bottom));
+}
+
+.page-head {
+  margin-bottom: 24px;
+}
+
+.page-lead {
+  max-width: 60ch;
+  margin-top: 6px;
+  color: var(--text-2);
+}
+
+@media (min-width: 960px) {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  }
+
+  .topbar,
+  .tabbar {
+    display: none;
+  }
+
+  /* Colonna laterale: logo, navigazione, azione principale, utente */
+  .rail {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    padding: 28px 16px 20px;
+    border-right: 1px solid var(--line);
+  }
+
+  .page {
+    padding: 40px 40px 96px;
+  }
+
+  .page-head {
+    margin-bottom: 32px;
+  }
+}
+
+.rail-logo {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0 0 32px 12px;
+  border-radius: var(--r-xs);
+}
+
+.rail-nav {
+  display: grid;
+  gap: 4px;
+}
+
+.rail-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  transition:
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease;
+}
+
+.rail-link:hover {
+  background: var(--plane);
+  color: var(--text);
+}
+
+.rail-link.active {
+  background: var(--plane);
+  color: var(--text);
+}
+
+.rail-link::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--violet);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity var(--dur) ease,
+    transform var(--dur-slow) var(--ease-spring);
+}
+
+.rail-link.active::after {
+  opacity: 1;
+  transform: none;
+}
+
+.rail-new {
+  position: relative;
+  margin-top: 20px;
+}
+
+/* Sul fondo viola il punto dell'elemento attivo è bianco, come nella variante del logo su viola */
+.rail-new::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity var(--dur-focus) var(--ease-out),
+    transform var(--dur-focus) var(--ease-out);
+}
+
+.rail-new.active::after {
+  opacity: 1;
+  transform: none;
+}
+
+.rail-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.rail-user {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px;
+  border-radius: var(--r-sm);
+  color: var(--text);
+  transition: background-color var(--dur-fast) ease;
+}
+
+.rail-user:hover {
+  background: var(--plane);
+}
+
+.rail-user > span:last-child {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.rail-user strong,
+.rail-user small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-user strong {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.rail-user small {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
+/* ---------- Mappa (Leaflet) ---------- */
+.map {
+  position: relative;
+  z-index: 0;
+  min-height: 200px;
+  border-radius: var(--r-md);
+  background: var(--plane-2);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Selettori con .map.leaflet-container: leaflet.css arriva dopo (chunk caricato on demand) */
+.map.leaflet-container {
+  font-family: var(--font);
+  background: #1b1b1f;
+}
+
+/* Tile di OpenStreetMap portate sulla parete scura, con una leggera virata verso il viola */
+.map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(195deg) brightness(0.9) contrast(0.88) saturate(0.4);
+}
+
+.map.leaflet-container .leaflet-bar {
+  border: 0;
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.map.leaflet-container .leaflet-bar a {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  border-bottom-color: var(--line);
+  background: var(--plane-2);
+  color: var(--text);
+}
+
+.map.leaflet-container .leaflet-bar a:hover {
+  background: var(--plane-3);
+}
+
+.map.leaflet-container .leaflet-bar a.leaflet-disabled {
+  background: var(--plane);
+  color: var(--text-3);
+}
+
+.map.leaflet-container .leaflet-control-attribution {
+  padding: 2px 8px;
+  border-top-left-radius: 8px;
+  background: rgb(15 15 15 / 0.8);
+  color: var(--text-2);
+  font-size: 10px;
+}
+
+.map.leaflet-container .leaflet-control-attribution a {
+  color: var(--text);
+}
+
+.map-pin span {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 2px;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--violet);
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 0.7);
+  transform: rotate(-45deg);
+  animation: pin-drop var(--dur-slow) var(--ease-out) both;
+}
+
+/* ---------- Animazioni ---------- */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Superficie che "si materializza": opacità, scala e sfocatura insieme */
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    filter: blur(6px);
+  }
+}
+
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) rotate(-45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.spinner),
+  *::before,
+  *::after,
+  ::backdrop {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .topbar,
+  .tabbar {
+    background: var(--wall);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

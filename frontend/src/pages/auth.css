@@ -1,0 +1,204 @@
+.auth {
+  display: grid;
+  min-height: 100dvh;
+  background: var(--wall);
+}
+
+@media (min-width: 960px) {
+  .auth {
+    grid-template-columns: minmax(0, 1.1fr) minmax(460px, 1fr);
+  }
+}
+
+/* Pannello di brand: l'unica superficie tutta viola del sito, come lo splash del mockup */
+.auth-brand {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 72px 40px;
+  background: var(--violet);
+  color: #fff;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.auth-blob {
+  position: absolute;
+  z-index: -1;
+  left: -16%;
+  bottom: -22%;
+  width: min(80%, 640px);
+  height: auto;
+}
+
+.auth-stripes {
+  position: absolute;
+  z-index: -1;
+  /* Tagliate dall'angolo del pannello, come su mobile */
+  top: -56px;
+  right: -56px;
+  width: 236px;
+  height: 236px;
+  background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.24) 0 9px, transparent 9px 22px);
+}
+
+.auth-mark {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  padding: 64px 72px;
+  text-align: center;
+}
+
+.auth-mark > .vf {
+  --vf-inset: 0;
+  --vf-size: 52px;
+  --vf-weight: 5px;
+  --vf-radius: 20px;
+  --vf-color: rgb(255 255 255 / 0.45);
+  filter: none;
+}
+
+.auth-logo {
+  gap: 0.28em;
+  color: #fff;
+  font-size: clamp(3.5rem, 1.6rem + 3.6vw, 5.5rem);
+  letter-spacing: -0.035em;
+}
+
+.auth-tagline {
+  color: rgb(255 255 255 / 0.92);
+  font-size: 1.375rem;
+  line-height: 1.35;
+}
+
+.auth-values {
+  position: absolute;
+  right: 0;
+  bottom: 48px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin: 0;
+  padding: 0 24px;
+  list-style: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.auth-values li {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.auth-side {
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 400px;
+  animation: materialize var(--dur-slow) var(--ease-out);
+}
+
+.auth-panel h1 {
+  font-size: 2.25rem;
+}
+
+.auth-lead {
+  margin: 10px 0 32px;
+  color: var(--text-2);
+}
+
+.auth .note-info {
+  margin-bottom: 20px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 20px;
+}
+
+.auth-form .btn-large {
+  margin-top: 8px;
+}
+
+.auth-switch {
+  margin-top: 28px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.auth-switch a {
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* Su schermi bassi i valori del brand non devono coprire il logo */
+@media (min-width: 960px) and (max-height: 720px) {
+  .auth-values {
+    display: none;
+  }
+}
+
+@media (max-width: 959px) {
+  .auth-brand {
+    padding: 44px 24px 72px;
+  }
+
+  .auth-mark {
+    gap: 12px;
+    padding: 36px 44px;
+  }
+
+  .auth-mark > .vf {
+    --vf-size: 32px;
+    --vf-weight: 4px;
+    --vf-radius: 13px;
+  }
+
+  .auth-logo {
+    font-size: 3rem;
+  }
+
+  .auth-tagline {
+    font-size: 1.0625rem;
+  }
+
+  /* Nell'angolo, tagliate dal bordo: lontane dagli angoli del mirino */
+  .auth-stripes {
+    top: -36px;
+    right: -26px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .auth-blob {
+    left: -30%;
+    bottom: -60%;
+    width: 90%;
+  }
+
+  .auth-values {
+    display: none;
+  }
+
+  /* Il modulo sale sopra il pannello viola come un foglio */
+  .auth-side {
+    position: relative;
+    place-items: start center;
+    margin-top: -28px;
+    padding: 36px 20px 56px;
+    border-radius: 28px 28px 0 0;
+    background: var(--wall);
+  }
+}

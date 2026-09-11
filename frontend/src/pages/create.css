@@ -1,0 +1,479 @@
+.create {
+  max-width: var(--content-w);
+  margin-inline: auto;
+}
+
+.create-grid {
+  display: grid;
+  align-items: start;
+  gap: 24px;
+}
+
+.create-media,
+.create-details {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* I campi stanno direttamente sulla parete: nessun pannello che li contenga */
+.create-details {
+  gap: 28px;
+}
+
+@media (min-width: 1180px) {
+  .create-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--grid-gap);
+  }
+
+  .create-media {
+    position: sticky;
+    top: 40px;
+  }
+}
+
+/* ---------- Fotocamera ---------- */
+.camera {
+  display: grid;
+  gap: 16px;
+}
+
+.camera-frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-lg);
+  background: #000;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+  isolation: isolate;
+  animation: materialize var(--dur-slow) var(--ease-out);
+}
+
+.camera-frame video,
+.camera-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-frame > .vf {
+  --vf-inset: 18px;
+  --vf-size: 34px;
+}
+
+/* Il punto del logo pulsa mentre la fotocamera è in diretta */
+.camera-frame.is-live > .vf-dot::after {
+  animation: live 1.6s ease-in-out infinite;
+}
+
+@keyframes live {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.camera-status {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  color: rgb(255 255 255 / 0.86);
+  text-align: center;
+}
+
+.camera-status p {
+  max-width: 38ch;
+}
+
+.camera-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.camera-flash {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background: #fff;
+  pointer-events: none;
+  animation: flash 420ms ease-out forwards;
+}
+
+@keyframes flash {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.camera-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+}
+
+/* Otturatore: anello bianco e disco viola, il disco si comprime alla pressione */
+.shutter {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border: 4px solid var(--text);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--dur-fast) ease;
+}
+
+.shutter::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--violet);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) ease;
+}
+
+@media (hover: hover) {
+  .shutter:hover:not(:disabled)::after {
+    background: var(--violet-hover);
+  }
+}
+
+.shutter:active:not(:disabled)::after {
+  transform: scale(0.84);
+}
+
+.shutter:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---------- Selezione foto ---------- */
+@media (max-width: 720px) {
+  .dropzone {
+    min-height: 240px;
+  }
+}
+
+.picker {
+  display: grid;
+  gap: 12px;
+  border-radius: var(--r-lg);
+  transition: background-color var(--dur) ease;
+}
+
+.picker.is-dragging {
+  background: repeating-linear-gradient(-45deg, rgb(124 58 237 / 0.12) 0 10px, transparent 10px 22px);
+  outline: 2px solid var(--violet-line);
+  outline-offset: 6px;
+}
+
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--r-md);
+  background: var(--plane);
+  overflow: hidden;
+  animation: thumb-in var(--dur-slow) var(--ease-out) both;
+}
+
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  pointer-events: none;
+}
+
+@keyframes thumb-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-order,
+.thumb-remove,
+.thumb-cover {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 26px;
+  border-radius: var(--r-pill);
+  background: rgb(15 15 15 / 0.72);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
+.thumb-order {
+  top: 8px;
+  left: 8px;
+  min-width: 26px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La prima foto è la copertina: è quella mostrata nella griglia del profilo */
+.thumb-cover {
+  bottom: 8px;
+  left: 8px;
+  padding: 0 9px;
+  background: var(--violet);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.thumb-remove {
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  border: 0;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+/* Area di tocco più ampia del cerchio visibile */
+.thumb-remove::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
+.thumb-remove:hover {
+  background: var(--danger-fill);
+}
+
+.thumb-remove:active {
+  transform: scale(0.88);
+}
+
+.thumb-add {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  aspect-ratio: 1;
+  border-radius: var(--r-md);
+  background: var(--plane);
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) ease,
+    color var(--dur) ease;
+}
+
+.thumb-add > .vf {
+  --vf-inset: 10px;
+  --vf-size: 18px;
+  --vf-weight: 2px;
+  --vf-radius: 7px;
+  --vf-color: var(--line-strong);
+  filter: none;
+}
+
+.thumb-add:hover {
+  background: var(--plane-2);
+  color: var(--violet-text);
+}
+
+.thumb-add:hover > .vf {
+  --vf-color: var(--violet-text);
+}
+
+.picker-count {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Posizione ---------- */
+.location {
+  display: grid;
+  gap: 12px;
+}
+
+.search {
+  position: relative;
+}
+
+.search input {
+  padding-inline: 44px;
+}
+
+.search-icon,
+.search .spinner {
+  position: absolute;
+  top: 15px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.search-icon {
+  left: 16px;
+}
+
+.search .spinner {
+  right: 16px;
+}
+
+.search-results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: var(--r-md);
+  background: var(--plane-2);
+  box-shadow:
+    var(--shadow-lg),
+    inset 0 0 0 1px var(--line);
+  transform-origin: top center;
+  animation: pop var(--dur) var(--ease-out);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.search-results button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-results button:hover,
+.search-results button:focus-visible {
+  background: var(--plane-3);
+}
+
+.search-results svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--text-3);
+}
+
+.search-empty {
+  padding: 12px;
+  color: var(--text-2);
+  font-size: 0.875rem;
+}
+
+/* isolation: lo z-index del suggerimento resta dentro la mappa, sotto i risultati della ricerca */
+.location-map {
+  position: relative;
+  height: 280px;
+  isolation: isolate;
+}
+
+.location-map .map {
+  height: 100%;
+}
+
+.map-hint {
+  position: absolute;
+  z-index: 500;
+  top: 12px;
+  left: 50%;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: rgb(15 15 15 / 0.82);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 0 1px var(--line);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  translate: -50% 0;
+}
+
+.place-chosen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 6px 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--violet-soft);
+  box-shadow: inset 0 0 0 1px var(--violet-line);
+  animation: rise var(--dur) var(--ease-out);
+}
+
+.place-chosen > svg {
+  flex: none;
+  color: var(--violet-text);
+}
+
+.place-chosen > div {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.place-chosen strong {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.place-chosen span {
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}

@@ -34,6 +34,7 @@ Continuazione del social network. L'applicazione permette di:
    - [3.8 Configurazione e avvio](#38-configurazione-e-avvio)
    - [3.9 Test](#39-test)
    - [3.10 Limiti noti e possibili evoluzioni](#310-limiti-noti-e-possibili-evoluzioni)
+   - [3.11 Screenshot](#311-screenshot)
 
 ---
 
@@ -47,6 +48,7 @@ Progetto-settimana-16/
 │   ├── pom.xml
 │   ├── mvnw, mvnw.cmd, .mvn/  ← Maven Wrapper (non serve installare Maven)
 │   ├── env.properties.example ← modello dei segreti locali
+│   ├── postman/               ← collection ed environment Postman, con i file di esempio
 │   └── src/
 │       ├── main/java/org/example/progettosettimana16/
 │       │   ├── config/        ← proprietà, sicurezza, pool asincrono
@@ -65,10 +67,14 @@ Progetto-settimana-16/
     ├── package.json
     ├── vite.config.js
     ├── index.html
+    ├── PRODUCT.md             ← contesto di prodotto e impegni della brand identity
+    ├── DESIGN.md              ← design system "Scatto": token, tipografia, griglia e regole d'uso
+    ├── public/favicon.svg     ← segno del logo
+    ├── docs/screenshots/      ← screenshot dell'applicazione usati in questo README
     ├── .env.example           ← modello di VITE_API_URL (il file reale .env.local non è versionato)
     └── src/
-        ├── main.jsx, App.jsx  ← avvio, router e rotte
-        ├── index.css          ← token di design (colori, forme, molle) e stili condivisi
+        ├── main.jsx, App.jsx  ← avvio, font del brand, router e rotte
+        ├── index.css          ← token del brand Scatto (colori, font, forme, movimento) e stili condivisi
         ├── auth/              ← contesto di autenticazione (token e utente)
         ├── components/        ← componenti riusabili: post, mappa, fotocamera, upload, documenti
         ├── lib/               ← chiamate API, verifica dei file, formattazione, paginazione
@@ -535,6 +541,30 @@ mvnw.cmd test      # Windows
 
 I test d'integrazione usano il profilo `test` con un database H2 in memoria: non serve PostgreSQL per eseguirli.
 
+#### Collection Postman
+
+In `backend/postman/` ci sono una collection e un environment pronti da importare, con i file di esempio per i form multipart: `files/foto-1.jpg`, `files/foto-2.jpg`, `files/foto-falsa.jpg` (un file di testo con estensione `.jpg`) e `files/documento-ocr.pdf`.
+
+1. In Postman scegli **Import** e seleziona `Scatto.postman_collection.json` e `Scatto-locale.postman_environment.json`.
+2. In alto a destra attiva l'environment **Scatto - locale** (`baseUrl` = `http://localhost:8080`).
+3. In **Settings → General → Working directory** imposta la cartella `backend/postman`, così Postman trova i file dei form. In alternativa riseleziona il file nella scheda *Body* della richiesta.
+4. Esegui per prima **1. Autenticazione → Registrazione (201)**: lo script crea un utente nuovo e salva `token`, `email`, `password` e `userId` nell'environment. Le altre richieste ereditano dalla collection l'autorizzazione *Bearer Token* con `{{token}}`.
+5. Prosegui in ordine, oppure esegui tutto con **Run collection** impostando un ritardo di 2500 ms tra le richieste, così l'OCR ha il tempo di completare.
+
+| Cartella | Richieste |
+|---|---|
+| 1. Autenticazione | Registrazione `201`, login `200`, utente corrente `200`, dati non validi `400`, registrazione duplicata `409`, password errata `401` |
+| 2. Post | Post `UPLOAD` con 2 foto e posizione `201`, post `CAMERA` con 1 foto `201`, `CAMERA` con 2 foto `400`, foto con formato falso `415`, indirizzo senza coordinate `400`, feed, dettaglio, post di un utente, foto pubblica senza token, eliminazione dei due post `204` |
+| 3. Documenti OCR | Upload `202`, lista, stato OCR e testo estratto, download del file originale, documento con formato falso `415`, eliminazione `204` |
+| 4. Geocoding | Indirizzo → coordinate, coordinate → indirizzo, ricerca troppo corta `400` |
+| 5. Errori di autenticazione | Richiesta protetta senza token `401` |
+
+Ogni richiesta verifica la risposta con `pm.test`, e la collection cancella i post e il documento che crea. È stata eseguita per intero con Newman contro il backend reale: 27 richieste e 40 verifiche, tutte superate. Dalla cartella `backend/postman`:
+
+```bash
+npx newman run Scatto.postman_collection.json -e Scatto-locale.postman_environment.json --working-dir . --delay-request 2500
+```
+
 ### 2.11 Limiti noti e possibili evoluzioni
 
 - **Storage locale**: i file sono sul disco del server. Con più istanze servirebbe uno storage condiviso (es. S3), sostituendo l'implementazione di `FileStorageService`.
@@ -557,27 +587,30 @@ Il frontend si chiama **Scatto**: è una single page application in italiano che
 | React Router | 8.3 | Rotte e pagine protette |
 | Leaflet | 1.9.4 | Mappa interattiva con tile OpenStreetMap |
 | Phosphor Icons | 2.1 | Icone SVG con tratto uniforme |
-| Geist Variable (Fontsource) | 5.3 | Carattere tipografico, incluso nel bundle (nessuna richiesta a Google Fonts) |
+| Poppins e Inter (Fontsource) | 5.3 | Caratteri del brand (Poppins per titoli e logo, Inter per i testi), inclusi nel bundle: nessuna richiesta a Google Fonts |
 | CSS nativo | – | Stili con custom properties, senza framework CSS |
 
 JavaScript, senza TypeScript. I test usano il test runner integrato di Node.js (`node --test`), quindi non servono librerie di test.
 
 ### 3.2 Scelte progettuali
 
-- **Poche dipendenze, piattaforma prima delle librerie.** Solo sei pacchetti a runtime. Dove il browser offre già la funzione, si usa quella:
+- **Poche dipendenze, piattaforma prima delle librerie.** Solo sette pacchetti a runtime, due dei quali sono i font del brand. Dove il browser offre già la funzione, si usa quella:
   - `<dialog>` nativo per le finestre di conferma (focus, tasto Esc e sovrapposizione gestiti dal browser);
   - `scroll-snap` CSS per il carosello delle foto (swipe, inerzia e interruzione del gesto sono nativi);
   - `FormData` per le richieste multipart, `getUserMedia` e `<canvas>` per la fotocamera;
   - `fetch` con un piccolo wrapper al posto di librerie HTTP; stato locale con `useState` e un solo Context per l'autenticazione.
 - **Logica in moduli puri.** Le regole sui file (`lib/fileValidation.js`) non dipendono da React: sono testate da sole con Node e riusate da foto e documenti.
 - **Stesse regole del backend.** Formati, dimensioni, numero di foto, lunghezza di didascalia e indirizzo, vincoli di username e password sono replicati lato client: l'utente vede subito l'errore, e il backend resta comunque l'ultima difesa.
-- **Design ispirato alle linee guida Apple**, morbido e leggero:
-  - materiali traslucidi (`backdrop-filter`) per la barra di navigazione, che su mobile diventa una tab bar flottante in basso;
-  - forme coerenti: controlli a pillola, campi con raggio 12 px, card con raggio 28 px;
-  - un solo colore d'accento blu su neutri freddi, ombre morbide tinte;
-  - feedback immediato alla pressione (leggera compressione dei pulsanti), animazioni solo su `transform` e `opacity` con curve a molla (`linear()`);
-  - tema chiaro e scuro automatici (`prefers-color-scheme`), rispetto di `prefers-reduced-motion` e `prefers-reduced-transparency`;
-  - stati completi: caricamento con skeleton, stati vuoti con azione, errori vicini al punto in cui nascono.
+- **Brand identity "Scatto" applicata a tutta l'interfaccia**, a partire dalla brand board:
+  - palette del brand: nero `#0F0F0F` come sfondo, grigio chiaro `#F5F5F7` per i testi, bianco, viola `#7C3AED` riservato ad azioni e stato attivo (il viola chiaro `#A78BFA` per i testi, per il contrasto); tema scuro in tutto il sito;
+  - tipografia: **Poppins** per titoli, nomi utente e logo, **Inter** per testi, etichette e dati, con numeri tabulari per date e dimensioni;
+  - logo ridisegnato in SVG (`components/Logo.jsx`): tre angoli del mirino, obiettivo pieno e punto viola al posto del quarto angolo; lo stesso segno su fondo viola è la favicon;
+  - gli elementi grafici del brand hanno sempre una funzione: gli **angoli del mirino** sostituiscono i bordi tratteggiati delle aree di caricamento e inquadrano il post al centro dello schermo; il **punto viola** segna la voce di navigazione attiva; le **righe diagonali** indicano un lavoro in corso (OCR in elaborazione, file trascinato sull'area); blob, righe e mirino compongono lo splash viola della pagina di accesso.
+- **Il feed come parete di mostra.** Ogni post è un'opera appesa con la sua didascalia sotto: autore, testo, **Tecnica** (Fotocamera o Upload, con il numero di foto) e **Luogo**, sempre nello stesso punto. Così i requisiti della traccia si leggono a colpo d'occhio. La gerarchia la danno i piani (parete, pannello, sovrapposizione), senza card annidate.
+- **Riga degli autori recenti** in stile storie, come nel mockup del brand, ma con dati veri: gli autori dei post caricati, con l'anello viola, portano al loro profilo. Il primo cerchio apre un nuovo post. Non vengono simulate funzioni che il backend non ha (storie, notifiche, ricerca utenti).
+- **Navigazione adattiva**: su desktop una colonna laterale con logo, voci e pulsante "Nuovo post"; su mobile una barra in alto e una barra in basso con il **+ viola** centrale sollevato, a portata di pollice.
+- **Movimento sobrio**: transizioni di stato di 160-320 ms con uscita esponenziale e un solo momento firmato, la "messa a fuoco" degli angoli del mirino sul post. Rispetto di `prefers-reduced-motion` e `prefers-reduced-transparency`.
+- **Stati e dettagli completi**: skeleton di caricamento, stati vuoti con l'azione da compiere, errori vicini al punto in cui nascono; selezione del testo, cursore, autocompletamento e barre di scorrimento a tema.
 - **Accessibilità di base.** Etichette visibili sopra i campi, errori collegati con `aria-describedby`, messaggi `role="alert"`, pulsanti icona con `aria-label`, focus visibile, target di tocco di almeno 44 px.
 
 ### 3.3 Struttura delle cartelle
@@ -586,12 +619,18 @@ JavaScript, senza TypeScript. I test usano il test runner integrato di Node.js (
 frontend/
 ├── index.html
 ├── package.json
+├── PRODUCT.md                 ← contesto di prodotto e impegni del brand (guida le scelte di design)
+├── DESIGN.md                  ← design system del brand ricavato dal codice: token, tipografia, griglia, regole
+├── public/
+│   └── favicon.svg            ← segno del logo su fondo viola
+├── docs/
+│   └── screenshots/           ← schermate usate nel README (sezione 3.11)
 ├── vite.config.js             ← porta 5173 fissa (strictPort) per il CORS
 ├── .env.example               ← VITE_API_URL di esempio
 └── src/
     ├── main.jsx               ← monta React, router e AuthProvider
     ├── App.jsx                ← definizione delle rotte
-    ├── index.css              ← token (colori, raggi, ombre, molle), base, controlli, guscio, mappa
+    ├── index.css              ← token del brand (colori, font, raggi, movimento), mirino, controlli, guscio, mappa
     ├── auth/
     │   └── AuthContext.jsx    ← utente corrente, login, registrazione, logout, gestione del 401
     ├── lib/
@@ -601,9 +640,10 @@ frontend/
     │   ├── format.js          ← dimensioni in KB/MB, date e tempo relativo in italiano
     │   └── usePagedPosts.js   ← hook per le liste di post paginate
     ├── components/
-    │   ├── Shell.jsx          ← barra di navigazione e protezione delle pagine
-    │   ├── ui.jsx             ← Avatar, Spinner, ErrorNote, Segmented, Modal, ConfirmDialog
-    │   ├── PostCard.jsx       ← post con carosello, posizione, mappa ed eliminazione
+    │   ├── Shell.jsx          ← colonna laterale (desktop), barre in alto e in basso (mobile), pagine protette
+    │   ├── Logo.jsx           ← logo SVG del brand: segno del mirino e scritta
+    │   ├── ui.jsx             ← Avatar, Viewfinder, EmptyState, Spinner, ErrorNote, Segmented, Modal, ConfirmDialog
+    │   ├── PostCard.jsx       ← post come opera con didascalia: carosello, tecnica, luogo, mappa, eliminazione
     │   ├── posts.css
     │   ├── MapView.jsx        ← wrapper di Leaflet (caricato solo quando serve)
     │   ├── CameraCapture.jsx  ← scatto con la fotocamera
@@ -612,7 +652,7 @@ frontend/
     │   └── Documents.jsx      ← upload, lista, polling OCR, testo estratto
     └── pages/
         ├── AuthPage.jsx       ← login e registrazione (auth.css)
-        ├── FeedPage.jsx       ← feed paginato
+        ├── FeedPage.jsx       ← feed paginato con la riga degli autori recenti
         ├── CreatePostPage.jsx ← creazione del post (create.css)
         └── ProfilePage.jsx    ← profilo, griglia dei post, documenti (profile.css)
 ```
@@ -623,14 +663,14 @@ frontend/
 |---|---|---|---|
 | `/login` | `AuthPage` | Pubblica | Login con email e password |
 | `/register` | `AuthPage` | Pubblica | Registrazione con username, email e password |
-| `/` | `FeedPage` | Protetta | Post dal più recente, pulsante "Carica altri" |
+| `/` | `FeedPage` | Protetta | Riga degli autori recenti, post dal più recente, pulsante "Carica altri" |
 | `/new` | `CreatePostPage` | Protetta | Fotocamera o upload, didascalia, posizione, pubblicazione |
 | `/profile` | `ProfilePage` | Protetta | Dati dell'utente, griglia dei suoi post, sezione Documenti (`?sezione=documenti`) |
 | `/users/:id` | `ProfilePage` | Protetta | Post di un altro utente (si apre dal nome dell'autore nel feed) |
 
 `Shell` avvolge tutte le pagine protette: se non c'è un utente autenticato reindirizza a `/login` e, dopo l'accesso, riporta alla pagina richiesta.
 
-`PostCard` mostra autore, data relativa ("5 minuti fa"), origine delle foto (Fotocamera o Upload), carosello con indicatori a punti, didascalia e posizione. L'indirizzo è un pulsante che apre una piccola mappa con il marker. Il cestino compare solo sui post dell'utente (`author.id === user.id`) e chiede conferma.
+`PostCard` mostra la foto (carosello con scroll-snap e indicatori se sono più di una, formato 4:5) e sotto la didascalia: autore con data relativa ("5 minuti fa"), testo, **Tecnica** con l'origine delle foto (Fotocamera o Upload e numero di foto) e **Luogo**. L'indirizzo è un pulsante che apre una piccola mappa con il marker. Il cestino compare solo sui post dell'utente (`author.id === user.id`) e chiede conferma. Nel feed un `IntersectionObserver` segnala il post che attraversa il centro dello schermo: gli angoli del mirino lo inquadrano (lo stesso effetto compare al passaggio del mouse e con il focus da tastiera). Se il file di una foto non si carica, al posto dell'icona rotta del browser compare un riquadro "Foto non disponibile".
 
 ### 3.5 Modalità di implementazione delle funzionalità
 
@@ -655,7 +695,7 @@ Un controllo segmentato sceglie la modalità. Le foto delle due modalità sono t
   5. Lo stream viene fermato quando si cambia modalità, si scatta o si lascia la pagina.
 - **Carica foto (`source=UPLOAD`)**
   1. Selezione multipla con click o trascinamento, da 1 a 10 immagini.
-  2. Anteprime numerate nell'ordine di invio, ognuna con il pulsante per rimuoverla; contatore "3 di 10 foto" con la dimensione totale.
+  2. Anteprime numerate nell'ordine di invio, ognuna con il pulsante per rimuoverla; la prima è segnata come **Copertina**, perché è quella mostrata nella griglia del profilo; contatore "3 di 10 foto" con la dimensione totale.
   3. I file oltre il decimo non vengono aggiunti e l'utente viene avvisato.
 
 Alla pubblicazione il modulo controlla numero di foto e didascalia, riverifica i file e costruisce il `FormData`: `source`, un campo `photos` per ogni foto, `caption` se presente, `latitude`, `longitude` e `address` se c'è una posizione. Il `Content-Type` multipart lo imposta il browser. Durante l'invio il pulsante mostra lo stato di caricamento; in caso di successo si torna al feed con la conferma "Post pubblicato", in caso di errore resta tutto compilato e il messaggio del backend è visibile.
@@ -697,14 +737,14 @@ L'attributo `accept` degli input (`acceptFor(rules)`) filtra solo la finestra di
 
 Il riquadro della posizione scelta mostra indirizzo e coordinate, con il pulsante **Rimuovi**. Un `502` del geocoding viene mostrato come errore senza bloccare il resto del modulo.
 
-`MapView` è un wrapper di Leaflet senza librerie React intermedie. Il marker è disegnato in CSS, così non servono le immagini di default di Leaflet; un `ResizeObserver` ricalcola la mappa quando nasce in un contenitore non ancora visibile. Nel tema scuro le tile vengono scurite con un filtro CSS. Leaflet è caricato con `React.lazy` solo quando una mappa compare davvero: il bundle iniziale scende da circa 500 kB a 350 kB.
+`MapView` è un wrapper di Leaflet senza librerie React intermedie. Il marker è disegnato in CSS, così non servono le immagini di default di Leaflet; un `ResizeObserver` ricalcola la mappa quando nasce in un contenitore non ancora visibile. Le tile vengono portate sul tema scuro con un filtro CSS (inversione e leggera virata verso il viola del brand), senza cambiare fornitore; il marker è viola con bordo bianco. Leaflet è caricato con `React.lazy` solo quando una mappa compare davvero: il bundle iniziale scende da circa 500 kB a 350 kB.
 
 #### Upload dei documenti e polling dell'OCR
 
 1. La sezione **Documenti** del profilo accetta un file alla volta (click o trascinamento), verificato con `DOCUMENT_RULES` prima dell'invio.
 2. `POST /api/users/me/documents` con il campo `file` risponde `202`: il documento compare in cima alla lista con stato "In attesa" e il dettaglio si apre.
 3. **Polling:** finché almeno un documento è `PENDING` o `PROCESSING`, ogni 2 secondi l'app richiede `GET /api/users/me/documents/{id}` per quei documenti e aggiorna la lista. Il timer si ferma da solo quando tutti sono `COMPLETED` o `FAILED`, e viene annullato se si lascia la pagina.
-4. Ogni riga ha un badge di stato: **In attesa**, **In elaborazione** (icona animata), **Completato**, **Errore**.
+4. Ogni riga ha un badge di stato: **In attesa** (righe diagonali del brand ferme), **In elaborazione** (righe che scorrono e icona animata), **Completato** (spunta), **Errore** (in rosso, l'unico colore semantico oltre al viola). Lo stato non è mai indicato dal solo colore (c'è sempre nome e icona) e la colonna del badge ha larghezza fissa, così il cambio di stato non sposta la riga.
 5. Aprendo una riga si vede:
    - il **testo estratto** (`extractedText`) con il pulsante **Copia**, che usa la Clipboard API e conferma con "Copiato";
    - oppure `ocrError` se l'elaborazione è fallita;
@@ -724,7 +764,7 @@ Tutte le chiamate passano da `api()`, che trasforma le risposte non riuscite in 
 | `react-router` | Rotte, redirect, parametri (`/users/:id`), query string della sezione del profilo | Gestione degli URL e del tasto indietro senza reinventarla |
 | `leaflet` | Mappa, click per scegliere il punto, marker | Gratuita, senza chiave, coerente con OpenStreetMap e Nominatim del backend |
 | `@phosphor-icons/react` | Icone | Set completo con pesi coerenti (regular e fill per la tab attiva), importabili una per una |
-| `@fontsource-variable/geist` | Carattere Geist variabile | Font servito dal bundle: niente richieste a servizi esterni per i font |
+| `@fontsource/poppins`, `@fontsource-variable/inter` | Poppins (500, 600, 700) per titoli, nomi e logo; Inter variabile per testi e dati | Sono i caratteri della brand identity; serviti dal bundle, quindi niente richieste a servizi esterni per i font |
 | `vite`, `@vitejs/plugin-react` (sviluppo) | Dev server e build | Avvio immediato, variabili d'ambiente `VITE_*`, code splitting |
 
 ### 3.7 Servizi esterni
@@ -790,5 +830,55 @@ I test girano con il test runner di Node.js e l'oggetto `File` nativo, senza bro
 - **Token in `localStorage`**: semplice e adatto a un'API stateless, ma leggibile da script in caso di XSS. In produzione si potrebbe usare un cookie `HttpOnly` emesso dal backend.
 - **Paginazione a offset**: se si elimina un post e poi si carica la pagina successiva, un post può essere saltato. Una paginazione a cursore lato API lo eviterebbe.
 - **Polling dell'OCR**: semplice e robusto; con molti utenti converrebbe una notifica push (Server-Sent Events o WebSocket).
-- **Foto quadrate nel feed**: le immagini sono ritagliate in 1:1 per un feed ordinato; le proporzioni originali non vengono mostrate.
+- **Foto ritagliate**: nel feed le immagini sono ritagliate in 4:5 e nella griglia del profilo in 1:1, per un layout ordinato e senza salti durante il caricamento; le proporzioni originali non vengono mostrate.
 - **Ordine delle foto**: è visibile e segue l'ordine di selezione; per cambiarlo si rimuove e si riaggiunge una foto (nessun trascinamento per riordinare).
+
+### 3.11 Screenshot
+
+Schermate dell'applicazione in esecuzione contro il backend reale, con utenti e post dimostrativi (foto da Unsplash).
+
+#### Accesso e registrazione
+
+Splash del brand con il modulo di accesso; su mobile il modulo sale sopra il pannello viola.
+
+<img src="frontend/docs/screenshots/01-login.png" alt="Pagina di accesso su desktop" width="640"> <img src="frontend/docs/screenshots/02-registrazione-mobile.png" alt="Registrazione su mobile" width="190">
+
+#### Feed
+
+Riga degli autori recenti e post con la didascalia: autore, testo, **Tecnica** (Fotocamera o Upload) e **Luogo**. Su mobile la barra in basso ha il + centrale.
+
+<img src="frontend/docs/screenshots/03-feed.png" alt="Feed su desktop" width="640"> <img src="frontend/docs/screenshots/04-feed-mobile.png" alt="Feed su mobile" width="190">
+
+#### Posizione del post nel feed
+
+L'indirizzo del post apre la mappa OpenStreetMap con il marker.
+
+![Mappa con la posizione del post](frontend/docs/screenshots/05-post-posizione-mappa.png)
+
+#### Nuovo post: upload e verifica dei formati lato frontend
+
+Tre foto valide con anteprime numerate e copertina; i due file non ammessi sono rifiutati prima dell'invio, uno per l'estensione (`documento.heic`) e uno per il contenuto letto dai magic bytes (`foto-falsa.jpg`).
+
+![Upload di più foto con file rifiutati](frontend/docs/screenshots/06-nuovo-post-upload-e-verifica-formati.png)
+
+#### Nuovo post: foto dalla fotocamera
+
+Anteprima dal vivo con `getUserMedia`, mirino e otturatore: si scatta una sola foto.
+
+![Scatto con la fotocamera](frontend/docs/screenshots/07-nuovo-post-fotocamera.png)
+
+#### Posizione: ricerca dell'indirizzo e punto sulla mappa
+
+Ricerca con debounce tramite il geocoding del backend; scegliendo un risultato il marker si sposta e coordinate e indirizzo vengono compilati.
+
+![Risultati della ricerca dell'indirizzo](frontend/docs/screenshots/08-posizione-ricerca-indirizzo.png)
+
+![Posizione scelta sulla mappa](frontend/docs/screenshots/09-posizione-scelta-sulla-mappa.png)
+
+#### Profilo e documenti con OCR
+
+Griglia dei post dell'utente e sezione Documenti con il badge di stato e il testo estratto dall'OCR, con i pulsanti Copia, Scarica ed Elimina.
+
+![Profilo con la griglia dei post](frontend/docs/screenshots/10-profilo.png)
+
+![Documento con il testo estratto](frontend/docs/screenshots/11-documenti-ocr.png)

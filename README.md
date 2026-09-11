@@ -48,7 +48,7 @@ Progetto-settimana-16/
 │   ├── pom.xml
 │   ├── mvnw, mvnw.cmd, .mvn/  ← Maven Wrapper (non serve installare Maven)
 │   ├── env.properties.example ← modello dei segreti locali
-│   ├── postman/               ← collection ed environment Postman, con i file di esempio
+│   ├── postman/               ← collection ed environment Postman, file di esempio e screenshot
 │   └── src/
 │       ├── main/java/org/example/progettosettimana16/
 │       │   ├── config/        ← proprietà, sicurezza, pool asincrono
@@ -564,6 +564,50 @@ Ogni richiesta verifica la risposta con `pm.test`, e la collection cancella i po
 ```bash
 npx newman run Scatto.postman_collection.json -e Scatto-locale.postman_environment.json --working-dir . --delay-request 2500
 ```
+
+##### Screenshot Postman
+
+Richieste eseguite in Postman contro il backend reale, con l'environment **Scatto - locale**.
+
+**1. Registrazione (201)**: la risposta contiene il token JWT e i dati dell'utente.
+
+![Registrazione 201](backend/postman/screenshots/01-registrazione.png)
+
+**2. Login (200)**
+
+![Login 200](backend/postman/screenshots/02-login.png)
+
+**3. Post `UPLOAD` con 2 foto e posizione (201)**: coordinate e indirizzo appartengono al post, le due foto sono nell'ordine di caricamento.
+
+![Post UPLOAD 201](backend/postman/screenshots/03-post-upload.png)
+
+**4. Post `CAMERA` con 1 foto (201)**
+
+![Post CAMERA 201](backend/postman/screenshots/04-post-camera.png)
+
+**5. Formato non ammesso (415)**: `foto-falsa.jpg` è un file di testo rinominato, rifiutato in base al contenuto.
+
+![Formato falso 415](backend/postman/screenshots/05-errore-formato-415.png)
+
+**6. Feed paginato (200)**
+
+![Feed paginato 200](backend/postman/screenshots/06-feed.png)
+
+**7. Upload di un documento (202)**: l'OCR parte in background con stato `PENDING`.
+
+![Upload documento 202](backend/postman/screenshots/07-documento-upload.png)
+
+**8. Stato dell'OCR (200)**: documento `COMPLETED` con il testo estratto in `extractedText`.
+
+![OCR completato](backend/postman/screenshots/08-ocr-completato.png)
+
+**9. Geocoding: indirizzo → coordinate (200)**
+
+![Geocoding 200](backend/postman/screenshots/09-geocoding.png)
+
+**10. Esecuzione dell'intera collection**: 40 test superati, 0 errori.
+
+![Collection runner](backend/postman/screenshots/10-runner.png)
 
 ### 2.11 Limiti noti e possibili evoluzioni
 
